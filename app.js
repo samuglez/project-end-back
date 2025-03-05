@@ -19,7 +19,8 @@ require("./config")(app);
 // 👇 Start handling routes here
 const indexRoutes = require("./routes/index.routes");
 app.use("/api", indexRoutes);
-
+const userRoutes = require("./routes/user.routes");
+app.use("/api/users", userRoutes);
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
 const publicacionesRoutes = require("./routes/publicaciones");
