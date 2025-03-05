@@ -9,6 +9,7 @@ require("./db/index");
 // https://www.npmjs.com/package/express
 const express = require("express");
 require("./models/User.model")
+require("./models/Publicacion")
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use("/api", indexRoutes);
 
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
+const publicacionesRoutes = require("./routes/publicaciones");
+app.use("/api/publicaciones", publicacionesRoutes);
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
