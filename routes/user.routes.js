@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
+const { isAdmin } = require("../middleware/jwt.middleware");
 const saltRounds = 10;
 
 router.get("/", (req, res, next) => {
@@ -17,7 +18,7 @@ router.get("/", (req, res, next) => {
     });
   res.json("All good in here");
 });
-router.post("/",async (req, res, next) => {
+router.post("/",isAdmin, async (req, res, next) => {
     try {
         // Check if password is provided
         if (!req.body.password) {
@@ -39,7 +40,7 @@ router.post("/",async (req, res, next) => {
         res.status(500).json({ error: "Failed to create new user: " + err.message });
       }
 });
-router.delete("/:userId", (req, res, next) => {
+router.delete("/:userId", isAdmin, (req, res, next) => {
   const {userId} = req.params
   User.findByIdAndDelete(userId)
   .then((deletedUser) => {
@@ -55,7 +56,7 @@ router.delete("/:userId", (req, res, next) => {
   })
 
 });
-router.put("/:userId", (req, res, next) => {
+router.put("/:userId", isAdmin, (req, res, next) => {
   const {userId} = req.params
   User.findByIdAndUpdate(userId, req.body, {new: true})
   .then((updatedUser) => {

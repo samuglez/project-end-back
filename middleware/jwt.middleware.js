@@ -22,8 +22,14 @@ function getTokenFromHeaders(req) {
 
   return null;
 }
+const isAdmin = (req,res,next) =>{
+  if(!req.payload.isAdmin){
+    return res.status(403).json({message: "Admin access required"})
+  }
+  next()
+}
 
 // Export the middleware so that we can use it to create protected routes
 module.exports = {
-  isAuthenticated,
+  isAuthenticated, isAdmin
 };

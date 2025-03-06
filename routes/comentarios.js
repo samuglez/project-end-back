@@ -4,11 +4,12 @@ const Comentario = require("../models/Comentario");
 const Publicacion = require("../models/Publicacion");
 const User = require("../models/User");
 const {
-    isAuthenticated
+    isAuthenticated,
+    isAdmin
 } = require("../middleware/jwt.middleware");
 
 // Obtener todos los comentarios
-router.get("/", isAuthenticated, async (req, res, next) => {
+router.get("/", isAdmin, isAuthenticated, async (req, res, next) => {
     try {
         const comentarios = await Comentario.find()
             .populate("publicacion", "nombreJuego")
@@ -32,6 +33,7 @@ router.get("/", isAuthenticated, async (req, res, next) => {
 // Crear un nuevo documento de comentario para una publicación
 router.post(
     "/publicacion/:publicacionId",
+    isAdmin,
     isAuthenticated,
     async (req, res, next) => {
         try {
@@ -102,6 +104,7 @@ router.post(
 // Añadir un comentario a un documento de comentarios existente
 router.post(
     "/:comentarioId/comentar",
+    isAdmin,
     isAuthenticated,
     async (req, res, next) => {
         try {
@@ -162,6 +165,7 @@ router.post(
 // Añadir una reacción a un documento de comentarios
 router.post(
     "/:comentarioId/reaccionar",
+    isAdmin,
     isAuthenticated,
     async (req, res, next) => {
         try {
@@ -245,6 +249,7 @@ router.post(
 // Añadir reacción directamente a una publicación
 router.post(
     "/publicacion/:publicacionId/reaccion",
+    isAdmin,
     isAuthenticated,
     async (req, res, next) => {
         try {
@@ -326,6 +331,7 @@ router.post(
 // Eliminar una reacción de un comentario
 router.delete(
     "/:comentarioId/reaccionar",
+    isAdmin,
     isAuthenticated,
     async (req, res, next) => {
         try {
@@ -380,6 +386,7 @@ router.delete(
 // Eliminar una reacción de una publicación
 router.delete(
     "/publicacion/:publicacionId/reaccion",
+    isAdmin,
     isAuthenticated,
     async (req, res, next) => {
         try {
@@ -430,7 +437,7 @@ router.delete(
 );
 
 // Obtener comentarios de una publicación específica
-router.get("/publicacion/:publicacionId", async (req, res, next) => {
+router.get("/publicacion/:publicacionId",isAdmin, async (req, res, next) => {
     try {
         const {
             publicacionId
@@ -477,6 +484,7 @@ router.get("/publicacion/:publicacionId", async (req, res, next) => {
 // Eliminar un comentario específico del array de comentarios
 router.delete(
     "/:comentarioId/comentario/:indiceComentario",
+    isAdmin,
     isAuthenticated,
     async (req, res, next) => {
         try {

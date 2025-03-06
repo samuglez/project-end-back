@@ -22,6 +22,12 @@ const userSchema = new Schema(
       default: Date.now,
       immutable: true
     },
+    rol:{
+      type: String,
+      required: true,
+      enum:["user", "admin"],
+      default: "user"
+    },
     // Referencias a las publicaciones del usuario
     publicaciones: [{
       type: Schema.Types.ObjectId,
