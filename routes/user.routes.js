@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
-const { isAdmin } = require("../middleware/jwt.middleware");
+const { isAdmin, isAuthenticated } = require("../middleware/jwt.middleware");
 const saltRounds = 10;
 
 router.get("/", (req, res, next) => {
@@ -16,9 +16,8 @@ router.get("/", (req, res, next) => {
       console.log(err,"Error to show users");
       res.status(500).json({ message: "Error to show users" });
     });
-  res.json("All good in here");
 });
-router.post("/",isAdmin, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     try {
         // Check if password is provided
         if (!req.body.password) {
@@ -56,7 +55,7 @@ router.delete("/:userId", isAdmin, (req, res, next) => {
   })
 
 });
-router.put("/:userId", isAdmin, (req, res, next) => {
+router.put("/:userId", isAdmin, isAuthenticated, (req, res, next) => {
   const {userId} = req.params
   User.findByIdAndUpdate(userId, req.body, {new: true})
   .then((updatedUser) => {

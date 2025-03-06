@@ -24,15 +24,15 @@ const userSchema = new Schema(
     },
     rol:{
       type: String,
-      required: true,
       enum:["user", "admin"],
       default: "user"
     },
     // Referencias a las publicaciones del usuario
-    publicaciones: [{
-      type: Schema.Types.ObjectId,
-      ref: "Publicacion"
-    }]
+    publicaciones: {
+      type: [Schema.Types.ObjectId],
+      ref: "Publicacion",
+      default: []
+    }
   },
   {
     timestamps: false,
