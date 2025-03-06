@@ -1,10 +1,10 @@
 const { Schema, model } = require("mongoose");
 
-// Esquema de la Publicación
 const publicacionSchema = new Schema(
   {
     usuario: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: [true, "Usuario es requerido."],
     },
     fechaPublicacion: {
@@ -35,49 +35,36 @@ const publicacionSchema = new Schema(
       type: String,
       enum: ["PlayStation", "Xbox", "Steam"],
       required: [true, "La plataforma donde se consiguió el logro es requerida."],
-      
     },
-    comentarios: [
-      {
-        comentario: {
-          type: String,
-        //   required: [true, "El comentario es requerido."],
-        },
-        usuario: {
-          type: String,
-          required: [true, "El nombre del usuario que comentó es requerido."],
-        },
-        fechaComentario: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    // Referencias a los comentarios de la publicación
+    comentarios: [{
+      type: Schema.Types.ObjectId,
+      ref: "Comentario"
+    }],
+    // Agregar reacciones directamente a la publicación
     reacciones: [
       {
         tipoReaccion: {
           type: String,
           enum: ["Me gusta", "Asombroso", "Epic", "Increíble"],
-        //   required: [true, "El tipo de reacción es requerido."],
         },
         usuario: {
-          type: String,
-          required: [true, "El nombre del usuario que reaccionó es requerido."],
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: [true, "El usuario que reaccionó es requerido."],
         },
         fechaReaccion: {
           type: Date,
           default: Date.now,
         },
       },
-    ],
+    ]
   },
   {
-    // Añadir campos de fecha automática
     timestamps: true,
   }
 );
 
-// Modelo de la publicación
 const Publicacion = model("Publicacion", publicacionSchema);
 
 module.exports = Publicacion;
