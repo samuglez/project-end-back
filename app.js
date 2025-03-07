@@ -10,12 +10,13 @@ require("./db/index");
 const express = require("express");
 require("./models/User.model")
 require("./models/Publicacion")
-// require("./models/Comentario")
+require("./models/Comentario")
 
 const app = express();
 
 // ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
 require("./config")(app);
+
 
 // 👇 Start handling routes here
 const indexRoutes = require("./routes/index.routes");
@@ -26,8 +27,8 @@ const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
 const publicacionesRoutes = require("./routes/publicaciones");
 app.use("/api/publicaciones", publicacionesRoutes);
-// const comentariosRoutes = require("./routes/comentarios");
-// app.use("/api/comentarios", comentariosRoutes);
+const comentariosRoutes = require("./routes/comentarios");
+app.use("/api/comentarios", comentariosRoutes);
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
