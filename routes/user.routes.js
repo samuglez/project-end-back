@@ -39,7 +39,7 @@ router.post("/", async (req, res, next) => {
         res.status(500).json({ error: "Failed to create new user: " + err.message });
       }
 });
-router.delete("/:userId", isAdmin, (req, res, next) => {
+router.delete("/:userId", isAuthenticated,isAdmin, (req, res, next) => {
   const {userId} = req.params
   User.findByIdAndDelete(userId)
   .then((deletedUser) => {
@@ -55,7 +55,7 @@ router.delete("/:userId", isAdmin, (req, res, next) => {
   })
 
 });
-router.put("/:userId", isAdmin, isAuthenticated, (req, res, next) => {
+router.put("/:userId", isAuthenticated, isAdmin, (req, res, next) => {
   const {userId} = req.params
   User.findByIdAndUpdate(userId, req.body, {new: true})
   .then((updatedUser) => {

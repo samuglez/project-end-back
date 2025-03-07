@@ -4,7 +4,7 @@ const Publicacion = require("../models/Publicacion"); // Importa el modelo de Pu
 const { isAuthenticated, isAdmin } = require("../middleware/jwt.middleware");
 
 // Ruta para obtener todas las publicaciones
-router.get("/",isAdmin, isAuthenticated, async (req, res, next) => {
+router.get("/",isAuthenticated,  async (req, res, next) => {
     try {
       // Obtener todas las publicaciones desde la base de datos
       const publicaciones = await Publicacion.find();
@@ -23,7 +23,7 @@ router.get("/",isAdmin, isAuthenticated, async (req, res, next) => {
     }
   });
 // Ruta para crear una nueva publicación
-router.post("/", isAdmin, isAuthenticated, async (req, res, next) => {
+router.post("/",isAuthenticated,   async (req, res, next) => {
     try {
       // Crear una nueva publicación con los datos proporcionados en el cuerpo de la solicitud
       const nuevaPublicacion = new Publicacion({
