@@ -47,5 +47,73 @@ router.post("/",isAuthenticated,   async (req, res, next) => {
       res.status(500).json({ message: "Error al crear la publicación." });
     }
   });
+  
+  // Ruta para actualizar una publicación existente
+router.put("/:id", isAuthenticated, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.payload._id;
+
+    // Primero verificamos si la publicación existe
+    const publicacionExistente = await Publicacion.findById(id);
+    
+    if (!publicacionExistente) {
+      return res.status(404).json({ message: "Publicación no encontrada" });
+    }
+
+    // Verificamos si el usuario es el creador de la publicación o es admin
+    if (publicacionExistente.usuario.toString() !== userId && req.payload.rol !== "admin") {
+      return res.status(403).json({ message: "No tienes permiso para editar esta publicación" });
+    }
+
+    // Actualizar la publicación
+    const publicacionActualizada = await Publicacion.findByIdAndUpdate(
+      id,
+      {
+        nombreJuego: req.body.nombreJuego,
+        trofeosLogros: req.body.trofeosLogros,
+        duracion: req.body.duracion,
+        dificultad: req.body.dificultad,
+        contenido: req.body.contenido,
+        plataforma: req.body.plataforma,
+        fechaActualizacion: new Date()
+      },
+      { new: true } // Para que devuelva el documento actualizado
+    );
+
+    res.status(200).json(publicacionActualizada);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al actualizar la publicación" });
+  }
+});
+
+// Ruta para eliminar una publicación
+router.delete("/:id", isAuthenticated, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.payload._id;
+
+    // Primero verificamos si la publicación existe
+    const publicacion = await Publicacion.findById(id);
+    
+    if (!publicacion) {
+      return res.status(404).json({ message: "Publicación no encontrada" });
+    }
+
+    // Verificamos si el usuario es el creador de la publicación o es admin
+    if (publicacion.usuario.toString() !== userId && req.payload.rol !== "admin") {
+      return res.status(403).json({ message: "No tienes permiso para eliminar esta publicación" });
+    }
+
+    // Eliminar la publicación
+    await Publicacion.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Publicación eliminada correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al eliminar la publicación" });
+  }
+});
 
 module.exports = router;
