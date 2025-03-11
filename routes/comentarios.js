@@ -27,20 +27,17 @@ router.get("/publicacion/:publicacionId", isAuthenticated, async (req, res, next
   try {
     const { publicacionId } = req.params;
     
-    // Verificar si la publicación existe
     const publicacion = await Publicacion.findById(publicacionId);
     if (!publicacion) {
       return res.status(404).json({ message: "Publicación no encontrada." });
     }
 
-    // Obtener los IDs de comentarios de la publicación
     const comentariosIds = publicacion.comentarios;
     
     if (!comentariosIds || comentariosIds.length === 0) {
       return res.status(404).json({ message: "Esta publicación no tiene comentarios." });
     }
 
-    // Buscar los comentarios por sus IDs
     const comentarios = await Comentario.find({ _id: { $in: comentariosIds } })
       .populate("usuario", "name email")
       .sort({ fechaComentario: -1 });
@@ -53,33 +50,31 @@ router.get("/publicacion/:publicacionId", isAuthenticated, async (req, res, next
 });
 
 // Crear un nuevo comentario en una publicación
-router.post("/publicacion/:publicacionId", isAuthenticated, async (req, res, next) => {
+router.post("/publicacion/:publicacionId", isAuthenticated, async (req, res) => {
   try {
     const { publicacionId } = req.params;
     const { content } = req.body;
     const userId = req.payload._id;
 
-    // Verificar si la publicación existe
+    if (!content || typeof content !== "string" || content.trim() === "") {
+      return res.status(400).json({ message: "El comentario no puede estar vacío." });
+    }
+
     const publicacion = await Publicacion.findById(publicacionId);
     if (!publicacion) {
       return res.status(404).json({ message: "Publicación no encontrada." });
     }
 
-    // Crear el nuevo comentario
     const nuevoComentario = new Comentario({
-      content,
+      content: content.trim(),
       usuario: userId,
-      fechaComentario: new Date()
+      fechaComentario: new Date(),
     });
 
-    // Guardar el comentario
     const comentarioGuardado = await nuevoComentario.save();
-
-    // Añadir el comentario a la publicación
     publicacion.comentarios.push(comentarioGuardado._id);
     await publicacion.save();
 
-    // Poblar el usuario para la respuesta
     await comentarioGuardado.populate("usuario", "name email");
 
     res.status(201).json(comentarioGuardado);
@@ -89,37 +84,30 @@ router.post("/publicacion/:publicacionId", isAuthenticated, async (req, res, nex
   }
 });
 
+
 // Eliminar un comentario
 router.delete("/:id", isAuthenticated, async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.payload._id;
 
-    // Buscar el comentario
     const comentario = await Comentario.findById(id);
-    
     if (!comentario) {
       return res.status(404).json({ message: "Comentario no encontrado." });
     }
 
-    // Verificar si el usuario es el creador del comentario o es admin
     if (comentario.usuario.toString() !== userId && req.payload.rol !== "admin") {
       return res.status(403).json({ message: "No tienes permiso para eliminar este comentario." });
     }
 
-    // Eliminar la referencia del comentario en la publicación
-    // Primero necesitamos encontrar la publicación que contiene este comentario
     const publicacion = await Publicacion.findOne({ comentarios: id });
-    
     if (publicacion) {
-      // Remover el comentario del array de comentarios de la publicación
       publicacion.comentarios = publicacion.comentarios.filter(
         comentarioId => comentarioId.toString() !== id
       );
       await publicacion.save();
     }
 
-    // Eliminar el comentario
     await Comentario.findByIdAndDelete(id);
 
     res.status(200).json({ message: "Comentario eliminado correctamente." });
