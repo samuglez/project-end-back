@@ -40,25 +40,7 @@ const publicacionSchema = new Schema(
     comentarios: [{
       type: Schema.Types.ObjectId,
       ref: "Comentario"
-    }],
-    // Agregar reacciones directamente a la publicación
-    reacciones: [
-      {
-        tipoReaccion: {
-          type: String,
-          enum: ["Me gusta", "Asombroso", "Epic", "Increíble"],
-        },
-        usuario: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          required: [true, "El usuario que reaccionó es requerido."],
-        },
-        fechaReaccion: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ]
+    }]
   },
   {
     timestamps: true,

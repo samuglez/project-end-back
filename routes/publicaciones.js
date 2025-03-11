@@ -4,7 +4,7 @@ const Publicacion = require("../models/Publicacion"); // Importa el modelo de Pu
 const { isAuthenticated, isAdmin } = require("../middleware/jwt.middleware");
 
 // Ruta para obtener todas las publicaciones
-router.get("/",isAuthenticated,  async (req, res, next) => {
+router.get("/",  async (req, res, next) => {
     try {
       // Obtener todas las publicaciones desde la base de datos
       const publicaciones = await Publicacion.find();
@@ -22,6 +22,44 @@ router.get("/",isAuthenticated,  async (req, res, next) => {
       res.status(500).json({ message: "Error al obtener las publicaciones." });
     }
   });
+  // Ruta para obtener todas las publicaciones de un usuario específico
+router.get("/usuario/:usuarioId", isAuthenticated, async (req, res, next) => {
+  try {
+    const { usuarioId } = req.params;
+    
+    const publicaciones = await Publicacion.find({ usuario: usuarioId });
+    
+    if (publicaciones.length === 0) {
+      return res.status(404).json({ message: "Este usuario no tiene publicaciones." });
+    }
+    
+    res.status(200).json(publicaciones);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al obtener las publicaciones del usuario." });
+  }
+});
+// Ruta para obtener una publicación específica por ID
+router.get("/:id", isAuthenticated, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    const publicacion = await Publicacion.findById(id)
+    .populate({
+      path: "comentarios",
+      populate: { path: "usuario", select: "name email" }, // Poblar el campo "usuario" en los comentarios
+    });
+    
+    if (!publicacion) {
+      return res.status(404).json({ message: "Publicación no encontrada." });
+    }
+    
+    res.status(200).json(publicacion);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al obtener la publicación." });
+  }
+});
 // Ruta para crear una nueva publicación
 router.post("/",isAuthenticated,   async (req, res, next) => {
     try {
