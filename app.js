@@ -5,6 +5,7 @@ require("dotenv").config();
 // ℹ️ Connects to the database
 require("./db/index");
 
+
 // Handles http requests (express is node js framework)
 // https://www.npmjs.com/package/express
 const express = require("express");
@@ -19,8 +20,11 @@ require("./config")(app);
 
 
 // 👇 Start handling routes here
+
 const indexRoutes = require("./routes/index.routes");
 app.use("/api", indexRoutes);
+const chatRoutes = require("./routes/chatRoutes");
+app.use("/api/ia", chatRoutes);
 const userRoutes = require("./routes/user.routes");
 app.use("/api/users", userRoutes);
 const authRoutes = require("./routes/auth.routes");
