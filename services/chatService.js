@@ -58,6 +58,7 @@ async function chatBot(prompt) {
         `;
 
         // Llamar a la API de Gemini
+        
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         console.log("Enviando prompt a Gemini...");
